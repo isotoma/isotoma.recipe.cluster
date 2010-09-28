@@ -36,9 +36,20 @@ class Cluster(object):
             ["PyYAML"], pybin,
             [self.buildout["buildout"]['develop-eggs-directory'], self.buildout['buildout']['eggs-directory']])
 
+        initialization = \
+            'services = """%(services)s"""\n' + \
+            'bindir = "%(bindir)s"\n' + \
+            'varrundir = "%(varrundir)s"\n'
+
+        initialization = initialization % {
+            "services": self.options["services"],
+            "bindir": bindir,
+            "varrundir": self.options.get("varrun-directory", os.path.join(self.buildout['buildout']['directory'],"var","run")),
+            }
+
         scripts = easy_install.scripts(
             [(self.name, "isotoma.recipe.cluster.ctl", "main")],
-            ws, pybin, bindir, initialization='services = """%s"""' % self.options["services"], arguments='services')
+            ws, pybin, bindir, initialization=initialization, arguments='services, bindir, varrundir')
 
         return [os.path.join(bindir, self.name)]
 

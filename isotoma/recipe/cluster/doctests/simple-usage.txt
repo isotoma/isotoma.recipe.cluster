@@ -41,10 +41,13 @@ A wrapper script should have been created::
   zope0:
   zope1:
   zope2:"""
+  bindir = "/sample-buildout/bin"
+  varrundir = "/sample-buildout/var/run"
+  <BLANKLINE>
   <BLANKLINE>
   import isotoma.recipe.cluster.ctl
   <BLANKLINE>
   if __name__ == '__main__':
-      isotoma.recipe.cluster.ctl.main(services)
+      isotoma.recipe.cluster.ctl.main(services, bindir, varrundir)
 
 
