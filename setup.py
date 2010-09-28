@@ -30,6 +30,7 @@ setup(
     install_requires = [
         'setuptools',
         'zc.buildout',
+        'PyYAML',
     ],
     extras_require=dict(
         test = ['zope.testing',],

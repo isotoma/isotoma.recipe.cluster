@@ -15,10 +15,10 @@ Lets create a minimal `buildout.cfg` file::
   ... [cluster]
   ... recipe = isotoma.recipe.cluster
   ... services =
-  ...     zeoserver
-  ...     zope0
-  ...     zope1
-  ...     zope2
+  ...     zeoserver:
+  ...     zope0:
+  ...     zope1:
+  ...     zope2:
   ... ''')
 
 Now we can run buildout::

@@ -14,6 +14,7 @@ from zope.testing import doctest, renormalizing
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
     zc.buildout.testing.install_develop('isotoma.recipe.cluster', test)
+    zc.buildout.testing.install('PyYAML', test)
     zc.buildout.testing.install('zope.testing', test)
 
 

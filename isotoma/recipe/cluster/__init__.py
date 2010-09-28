@@ -15,6 +15,7 @@
 import logging
 import os
 import zc.buildout
+import yaml
 
 class Cluster(object):
 
@@ -24,8 +25,10 @@ class Cluster(object):
         self.options = options
 
     def install(self):
-        config = self.options["services"]
+        config = yaml.load(self.options["services"])
 
         binpath = os.path.join(self.buildout['buildout']['bin-directory'], self.name)
         open(binpath, "w").write("\n\n")
         return [binpath]
+
+
