@@ -30,14 +30,13 @@ setup(
     install_requires = [
         'setuptools',
         'zc.buildout',
-        'isotoma.recipe.gocaptain',
     ],
     extras_require=dict(
         test = ['zope.testing',],
     ),
     entry_points = {
         "zc.buildout": [
-            "default = isotoma.recipe.apache:Apache",
+            "default = isotoma.recipe.cluster:Cluster",
         ],
     }
 )

@@ -24,6 +24,8 @@ class Cluster(object):
         self.options = options
 
     def install(self):
-        binpath = os.path.join(buildout['buildout']['bin-directory'], self.name)
-        open(binpath, "w").write("")
+        config = self.options["services"]
+
+        binpath = os.path.join(self.buildout['buildout']['bin-directory'], self.name)
+        open(binpath, "w").write("\n\n")
         return [binpath]
