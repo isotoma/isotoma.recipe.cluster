@@ -16,7 +16,43 @@ import os, sys, subprocess, shlex
 import yaml
 
 
-class Service(object):
+class BaseService(object):
+
+    @property
+    def pid(self):
+        pidfile = self.pidfile
+        if not os.path.exists(pidfile):
+            return None
+
+        pid = open(pidfile).read().strip()
+        try:
+            pid = int(pid)
+        except:
+            return None
+
+        return pid
+
+    def alive(self):
+        pid = self.pid
+
+        if not pid:
+            return False
+
+        # Try kill() with signal 0
+        # No exceptions means the pid is alive
+        #  Special case: if we dont have permissions, give up
+        try:
+            os.kill(pid, 0)
+            return True
+        except OSError, e:
+            if e.errno == 3:
+                if "No such process" in e.strerror:
+                    return False
+                raise SystemExit("We don't have permission to check the status of that pid")
+        return False
+
+
+class Service(BaseService):
 
     """ I am a service that can be stopped and started and can report my status """
 
@@ -75,9 +111,6 @@ class Service(object):
             return 1
 
         return 0
-
-    def alive(self):
-        return False
 
 
 class Services(object):
