@@ -1,0 +1,35 @@
+Detailed Description
+********************
+
+Simple creation of an apache config
+===================================
+
+Lets create a minimal `buildout.cfg` file::
+
+  >>> write('buildout.cfg',
+  ... '''
+  ... [buildout]
+  ... parts = cluster
+  ... offline = true
+  ...
+  ... [cluster]
+  ... recipe = isotoma.recipe.cluster
+  ... services =
+  ...     zeoserver
+  ...     zope0
+  ...     zope1
+  ...     zope2
+  ... ''')
+
+Now we can run buildout::
+
+  >>> print system(join('bin', 'buildout')),
+  Installing cluster.
+
+The template was indeed created::
+
+  >>> cat('bin/cluster')
+  <BLANKLINE>
+  <BLANKLINE>
+
+
