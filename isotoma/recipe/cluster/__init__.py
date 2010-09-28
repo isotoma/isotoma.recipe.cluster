@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import os
-import zc.buildout
+import logging, os, sys
 import yaml
+from zc.buildout import UserError, easy_install
 
 class Cluster(object):
 
@@ -25,10 +24,22 @@ class Cluster(object):
         self.options = options
 
     def install(self):
-        config = yaml.load(self.options["services"])
+        pybin = self.buildout["buildout"]["executable"]
+        bindir = self.buildout['buildout']['bin-directory']
 
-        binpath = os.path.join(self.buildout['buildout']['bin-directory'], self.name)
-        open(binpath, "w").write("\n\n")
-        return [binpath]
+        try:
+            config = yaml.load(self.options["services"])
+        except:
+            raise UserError("Error parsing yaml")
+
+        ws = easy_install.working_set(
+            ["PyYAML"], pybin,
+            [self.buildout["buildout"]['develop-eggs-directory'], self.buildout['buildout']['eggs-directory']])
+
+        scripts = easy_install.scripts(
+            [(self.name, "isotoma.recipe.cluster.ctl", "main")],
+            ws, pybin, bindir, initialization='services = """%s"""' % self.options["services"], arguments='services')
+
+        return [os.path.join(bindir, self.name)]
 
 

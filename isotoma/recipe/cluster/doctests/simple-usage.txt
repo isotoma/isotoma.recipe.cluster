@@ -25,11 +25,26 @@ Now we can run buildout::
 
   >>> print system(join('bin', 'buildout')),
   Installing cluster.
+  Generated script '/sample-buildout/bin/cluster'.
 
-The template was indeed created::
+A wrapper script should have been created::
 
   >>> cat('bin/cluster')
   <BLANKLINE>
+  import sys
+  sys.path[0:0] = [
+    '/sample-pyN.N.egg',
+    ]
   <BLANKLINE>
+  services = """
+  zeoserver:
+  zope0:
+  zope1:
+  zope2:"""
+  <BLANKLINE>
+  import isotoma.recipe.cluster.ctl
+  <BLANKLINE>
+  if __name__ == '__main__':
+      isotoma.recipe.cluster.ctl.main(services)
 
 
