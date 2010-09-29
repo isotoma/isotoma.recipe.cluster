@@ -96,7 +96,10 @@ class Service(BaseService):
         p = subprocess.Popen(shlex.split(self.start_command), env=self.env)
         p.wait()
 
-        time.sleep(1)
+        for i in range(100):
+            time.sleep(0.1)
+            if self.alive():
+                return 0
 
         if not self.alive():
             print >>sys.stderr, " >> Service is not running"
@@ -114,7 +117,11 @@ class Service(BaseService):
         p = subprocess.Popen(shlex.split(self.stop_command), env=self.env)
         p.wait()
 
-        time.sleep(1)
+        for i in range(100):
+            time.sleep(0.1)
+            if not self.alive():
+                return 0
+
 
         if self.alive():
             print >>sys.stderr, " >> Service is still running"
@@ -129,8 +136,12 @@ class Services(object):
 
     def __init__(self, bindir, varrundir, services):
         self.services = []
-        for service, values in services.iteritems():
-            self.services.append(Service(bindir, varrundir, service, values or {}))
+        for service in services:
+            if isinstance(service, dict):
+                servicename, values = service.items()[0]
+                self.services.append(Service(bindir, varrundir, servicename, values or {}))
+            else:
+                self.services.append(Service(bindir, varrundir, service, {}))
 
     def start(self):
         """ start everything in the list of daemons """

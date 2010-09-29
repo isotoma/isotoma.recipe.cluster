@@ -1,7 +1,7 @@
 """Test setup for isotoma.recipe.apache.
 """
 
-import os, sys, subprocess, re
+import os, sys, subprocess, re, time
 import pkg_resources
 
 import zc.buildout.testing
@@ -11,6 +11,7 @@ import zope.testing
 from zope.testing import doctest, renormalizing
 
 from isotoma.recipe.cluster.ctl import BaseService, Service, Services
+
 
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
@@ -37,6 +38,7 @@ class TestCtl(unittest.TestCase):
         env["PYTHONPATH"] = ":".join(sys.path)
         p = subprocess.Popen([sys.executable, sibpath("testservice.py"), os.path.realpath(pid), command], env=env)
         p.wait()
+        time.sleep(1) # evil
 
     def service(self, pid):
         s = Service("", "", "cluster", {
@@ -48,14 +50,16 @@ class TestCtl(unittest.TestCase):
         return s
 
     def services(self, *pids):
-        services = {}
+        services = []
         for pid in pids:
-            services[pid] = {
+            service = {
                 "pidfile": os.path.realpath(pid),
                 "start-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "start")),
                 "stop-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
                 "env": {"PYTHONPATH": ":".join(sys.path)},
                 }
+            services.append({pid: service})
+
         return Services("", "", services)
 
     def raw_start_service(self, pid):
@@ -113,6 +117,7 @@ class TestCtl(unittest.TestCase):
         self.failUnless(self.status_service("a.pid") and self.status_service("b.pid"))
         s.stop()
         self.failUnless(not self.status_service("a.pid") and not self.status_service("b.pid"))
+
 
 def test_suite():
     tests = [
