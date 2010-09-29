@@ -82,8 +82,14 @@ class TestCtl(unittest.TestCase):
 
     def test_service_start(self):
         s = self.service("a.pid")
-        s.start()
+        self.failUnlessEqual(s.start(), 0)
         self.failUnless(self.status_service("a.pid"))
+        self.raw_stop_service("a.pid")
+
+    def test_service_start_twice(self):
+        s = self.service("a.pid")
+        self.failUnlessEqual(s.start(), 0)
+        self.failUnless(s.start() != 0)
         self.raw_stop_service("a.pid")
 
     def test_service_alive(self):
@@ -96,10 +102,14 @@ class TestCtl(unittest.TestCase):
     def test_service_stop(self):
         s = self.service("a.pid")
         self.failUnless(not s.alive())
-        s.start()
+        self.failUnlessEqual(s.start(), 0)
         self.failUnless(s.alive())
-        s.stop()
+        self.failUnlessEqual(s.stop(), 0)
         self.failUnless(not s.alive())
+
+    def test_service_stop_when_not_running(self):
+        s = self.service("a.pid")
+        self.failUnless(s.stop() != 0)
 
     def test_services_start(self):
         s = self.services("a.pid", "b.pid")

@@ -91,7 +91,7 @@ class Service(BaseService):
 
         if self.alive():
             print >>sys.stderr, " >> Service is already started"
-            return 0
+            return 1
 
         p = subprocess.Popen(shlex.split(self.start_command), env=self.env)
         p.wait()
@@ -112,7 +112,7 @@ class Service(BaseService):
 
         if not self.alive():
             print >>sys.stderr, " >> Service is already stopped"
-            return 0
+            return 1
 
         p = subprocess.Popen(shlex.split(self.stop_command), env=self.env)
         p.wait()
