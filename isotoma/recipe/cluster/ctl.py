@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, sys, subprocess, shlex
+import os, sys, subprocess, shlex, time
 import yaml
 
 
@@ -66,19 +66,25 @@ class Service(BaseService):
     def start_command(self):
         if "start-command" in self.settings:
             return self.settings["start-command"]
-        return "%s start", os.path.join(self.bindir, "bin", self.service)
+        return "%s start" % os.path.join(self.bindir, "bin", self.service)
 
     @property
     def stop_command(self):
         if "stop-command" in self.settings:
             return self.settings["stop-command"]
-        return "%s stop", os.path.join(self.bindir, "bin", self.service)
+        return "%s stop" % os.path.join(self.bindir, "bin", self.service)
 
     @property
     def pidfile(self):
         if "pidfile" in self.settings:
             return self.settings["pidfile"]
         return os.path.join(self.varrundir, "var", "%s.pid" % self.service)
+
+    @property
+    def env(self):
+        if "env" in self.settings:
+            return self.settings["env"]
+        return None
 
     def start(self):
         print "Attempting to start %s" % self.service
@@ -87,8 +93,10 @@ class Service(BaseService):
             print >>sys.stderr, " >> Service is already started"
             return 0
 
-        p = subprocess.Popen(shlex.split(self.start_command))
+        p = subprocess.Popen(shlex.split(self.start_command), env=self.env)
         p.wait()
+
+        time.sleep(1)
 
         if not self.alive():
             print >>sys.stderr, " >> Service is not running"
@@ -103,8 +111,10 @@ class Service(BaseService):
             print >>sys.stderr, " >> Service is already stopped"
             return 0
 
-        p = subprocess.Popen(shlex.split(self.stop_command))
+        p = subprocess.Popen(shlex.split(self.stop_command), env=self.env)
         p.wait()
+
+        time.sleep(1)
 
         if self.alive():
             print >>sys.stderr, " >> Service is still running"
@@ -120,7 +130,7 @@ class Services(object):
     def __init__(self, bindir, varrundir, services):
         self.services = []
         for service, values in services.iteritems():
-            self.services.append(bindir, varrundir, service, values or {})
+            self.services.append(Service(bindir, varrundir, service, values or {}))
 
     def start(self):
         """ start everything in the list of daemons """

@@ -10,7 +10,7 @@ import unittest
 import zope.testing
 from zope.testing import doctest, renormalizing
 
-from isotoma.recipe.cluster.ctl import BaseService, Service
+from isotoma.recipe.cluster.ctl import BaseService, Service, Services
 
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
@@ -42,9 +42,21 @@ class TestCtl(unittest.TestCase):
         s = Service("", "", "cluster", {
             "pidfile": os.path.realpath(pid),
             "start-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "start")),
-            "stop_command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
+            "stop-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
+            "env": {"PYTHONPATH": ":".join(sys.path)},
             })
         return s
+
+    def services(self, *pids):
+        services = {}
+        for pid in pids:
+            services[pid] = {
+                "pidfile": os.path.realpath(pid),
+                "start-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "start")),
+                "stop-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
+                "env": {"PYTHONPATH": ":".join(sys.path)},
+                }
+        return Services("", "", services)
 
     def raw_start_service(self, pid):
         self.raw_test_service(pid, "start")
@@ -75,6 +87,32 @@ class TestCtl(unittest.TestCase):
         self.failUnless(not s.alive())
         s.start()
         self.failUnless(s.alive())
+        self.raw_stop_service("a.pid")
+
+    def test_service_stop(self):
+        s = self.service("a.pid")
+        self.failUnless(not s.alive())
+        s.start()
+        self.failUnless(s.alive())
+        s.stop()
+        self.failUnless(not s.alive())
+
+    def test_services_start(self):
+        s = self.services("a.pid", "b.pid")
+        self.failUnless(not self.status_service("a.pid") and not self.status_service("b.pid"))
+        s.start()
+        self.failUnless(self.status_service("a.pid") and self.status_service("b.pid"))
+        self.raw_stop_service("a.pid")
+        self.raw_stop_service("b.pid")
+        self.failUnless(not self.status_service("a.pid") and not self.status_service("b.pid"))
+
+    def test_services_stop(self):
+        s = self.services("a.pid", "b.pid")
+        self.failUnless(not self.status_service("a.pid") and not self.status_service("b.pid"))
+        s.start()
+        self.failUnless(self.status_service("a.pid") and self.status_service("b.pid"))
+        s.stop()
+        self.failUnless(not self.status_service("a.pid") and not self.status_service("b.pid"))
 
 def test_suite():
     tests = [
