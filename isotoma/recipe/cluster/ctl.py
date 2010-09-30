@@ -15,11 +15,20 @@
 import os, sys, subprocess, shlex, time
 import yaml
 
+class NothingToDo(Exception):
+    pass
+
+class ActionFailed(Exception):
+    pass
+
 
 class BaseService(object):
 
+    """ I am a service that has a pidfile and can report whether i am alive or not """
+
     @property
     def pid(self):
+        """ I read the pidfile and return it """
         pidfile = self.pidfile
         if not os.path.exists(pidfile):
             return None
@@ -33,6 +42,7 @@ class BaseService(object):
         return pid
 
     def alive(self):
+        """ I check if my pid is alive """
         pid = self.pid
 
         if not pid:
@@ -87,10 +97,12 @@ class Service(BaseService):
         return None
 
     def start(self):
+        """ I attempt to to start a service """
+
         print "Attempting to start %s" % self.service
 
         if self.alive():
-            print >>sys.stderr, " >> Service is already started"
+            raise NothingToDo("Service already running")
             return 1
 
         p = subprocess.Popen(shlex.split(self.start_command), env=self.env)
@@ -99,20 +111,19 @@ class Service(BaseService):
         for i in range(100):
             time.sleep(0.1)
             if self.alive():
-                return 0
+                return
 
         if not self.alive():
-            print >>sys.stderr, " >> Service is not running"
-            return 1
+            raise ActionFailed("Could not start service")
 
-        return 0
 
     def stop(self):
-        print "Attempting to stop %s" % self.service
+        """ I attempt to to stop a service """
+
+        print "Attempting to stop %s (pid=%s)" % (self.service, self.pid)
 
         if not self.alive():
-            print >>sys.stderr, " >> Service is already stopped"
-            return 1
+            raise NothingToDo("Service is already stopped")
 
         p = subprocess.Popen(shlex.split(self.stop_command), env=self.env)
         p.wait()
@@ -120,14 +131,10 @@ class Service(BaseService):
         for i in range(100):
             time.sleep(0.1)
             if not self.alive():
-                return 0
-
+                return
 
         if self.alive():
-            print >>sys.stderr, " >> Service is still running"
-            return 1
-
-        return 0
+            raise ActionFailed("Service wouldn't shut down")
 
 
 class Services(object):
@@ -144,24 +151,28 @@ class Services(object):
                 self.services.append(Service(bindir, varrundir, service, {}))
 
     def start(self):
-        """ start everything in the list of daemons """
+        """ I start everything in the list of daemons """
         for service in self.services:
             service.start()
 
     def stop(self):
-        """ reverse the list of daemons, then stop everything """
+        """ I reverse the list of daemons, then stop everything """
         services = self.services[:]
         services.reverse()
         for service in services:
-            service.stop()
+            try:
+                service.stop()
+            except NothingToDo:
+                # if service is already stopped, we just carry on
+                pass
 
     def restart(self):
-        """ stop all of the daemons, then start them again """
+        """ I stop all of the daemons, then start them again """
         self.stop()
         self.start()
 
     def status(self):
-        """ iterate a dictionary of daemon information and get status info """
+        """ I iterate a dictionary of daemon information and get status info """
         for service in self.services:
             service.status()
 
@@ -172,14 +183,19 @@ def main(services_yaml, bindir, varrundir):
 
     services = Services(bindir, varrundir, yaml.load(services_yaml))
 
-    if sys.argv[1] == "start":
-        return services.start()
-    elif sys.argv[1] == "stop":
-        return services.stop()
-    elif sys.argv[1] == "restart":
-        return services.restart()
-    elif sys.argv[1] == "status":
-        return services.status()
+    try:
+        if sys.argv[1] == "start":
+            return services.start()
+        elif sys.argv[1] == "stop":
+            return services.stop()
+        elif sys.argv[1] == "restart":
+            return services.restart()
+        elif sys.argv[1] == "status":
+            return services.status()
+    except NothingToDo, e:
+        print >>sys.stderr, "Nothing To Do:", e.args[0]
+    except ActionFailed, e:
+        print >>sys.stderr, "Action Failed:", e.args[0]
 
     print >>sys.stderr, "%(name) (start|stop|restart|status)" % name
     return 1

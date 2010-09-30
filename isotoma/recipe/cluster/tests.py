@@ -10,7 +10,7 @@ import unittest
 import zope.testing
 from zope.testing import doctest, renormalizing
 
-from isotoma.recipe.cluster.ctl import BaseService, Service, Services
+from isotoma.recipe.cluster.ctl import BaseService, Service, Services, NothingToDo
 
 
 def setUp(test):
@@ -82,14 +82,14 @@ class TestCtl(unittest.TestCase):
 
     def test_service_start(self):
         s = self.service("a.pid")
-        self.failUnlessEqual(s.start(), 0)
+        s.start()
         self.failUnless(self.status_service("a.pid"))
         self.raw_stop_service("a.pid")
 
     def test_service_start_twice(self):
         s = self.service("a.pid")
-        self.failUnlessEqual(s.start(), 0)
-        self.failUnless(s.start() != 0)
+        s.start()
+        self.failUnlessRaises(NothingToDo, s.start)
         self.raw_stop_service("a.pid")
 
     def test_service_alive(self):
@@ -102,14 +102,14 @@ class TestCtl(unittest.TestCase):
     def test_service_stop(self):
         s = self.service("a.pid")
         self.failUnless(not s.alive())
-        self.failUnlessEqual(s.start(), 0)
+        s.start()
         self.failUnless(s.alive())
-        self.failUnlessEqual(s.stop(), 0)
+        s.stop()
         self.failUnless(not s.alive())
 
     def test_service_stop_when_not_running(self):
         s = self.service("a.pid")
-        self.failUnless(s.stop() != 0)
+        self.failUnlessRaises(NothingToDo, s.stop)
 
     def test_services_start(self):
         s = self.services("a.pid", "b.pid")
