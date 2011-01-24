@@ -177,7 +177,7 @@ class Services(object):
             service.status()
 
 
-def main(services_yaml, bindir, varrundir):
+def main(services_yaml, name, bindir, varrundir):
     if len(sys.argv) != 2:
         return 1
 
