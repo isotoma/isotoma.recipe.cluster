@@ -197,7 +197,7 @@ def main(services_yaml, name, bindir, varrundir):
     except ActionFailed, e:
         print >>sys.stderr, "Action Failed:", e.args[0]
 
-    print >>sys.stderr, "%(name) (start|stop|restart|status)" % name
+    print >>sys.stderr, "%s (start|stop|restart|status)" % name
     return 1
 
 
