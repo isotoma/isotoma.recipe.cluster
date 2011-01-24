@@ -33,7 +33,7 @@ class Cluster(object):
             raise UserError("Error parsing yaml")
 
         ws = easy_install.working_set(
-            ["PyYAML"], pybin,
+            ["PyYAML", "isotoma.recipe.cluster"], pybin,
             [self.buildout["buildout"]['develop-eggs-directory'], self.buildout['buildout']['eggs-directory']])
 
         initialization = \
