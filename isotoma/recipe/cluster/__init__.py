@@ -38,7 +38,7 @@ class Cluster(object):
 
         initialization = \
             'services = """%(services)s"""\n' + \
-            'name = "%(name)"\n' + \
+            'name = "%(name)s"\n' + \
             'bindir = "%(bindir)s"\n' + \
             'varrundir = "%(varrundir)s"\n'
 
