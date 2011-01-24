@@ -76,19 +76,19 @@ class Service(BaseService):
     def start_command(self):
         if "start-command" in self.settings:
             return self.settings["start-command"]
-        return "%s start" % os.path.join(self.bindir, "bin", self.service)
+        return "%s start" % os.path.join(self.bindir, self.service)
 
     @property
     def stop_command(self):
         if "stop-command" in self.settings:
             return self.settings["stop-command"]
-        return "%s stop" % os.path.join(self.bindir, "bin", self.service)
+        return "%s stop" % os.path.join(self.bindir, self.service)
 
     @property
     def pidfile(self):
         if "pidfile" in self.settings:
             return self.settings["pidfile"]
-        return os.path.join(self.varrundir, "var", "%s.pid" % self.service)
+        return os.path.join(self.varrundir, "%s.pid" % self.service)
 
     @property
     def env(self):
