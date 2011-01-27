@@ -114,6 +114,9 @@ class Service(BaseService):
         p = subprocess.Popen(shlex.split(self.start_command), env=self.env)
         p.wait()
 
+        if p.returncode != 0:
+            raise ActionFailed("Start script reported error")
+
         for i in range(100):
             time.sleep(0.1)
             if self.alive():
@@ -134,6 +137,9 @@ class Service(BaseService):
         p = subprocess.Popen(shlex.split(self.stop_command), env=self.env)
         p.wait()
 
+        if p.returncode != 0:
+            raise ActionFailed("Stop script reported error")
+
         for i in range(100):
             time.sleep(0.1)
             if not self.alive():
@@ -141,6 +147,13 @@ class Service(BaseService):
 
         if self.alive():
             raise ActionFailed("Service wouldn't shut down")
+
+    def status(self):
+        pid = self.pid or "no pid"
+        if self.alive():
+            print "'%s' is alive (%s)." % (self.servicename, pid)
+        else:
+            print "'%s' is not running." % self.servicename
 
 
 class Services(object):
