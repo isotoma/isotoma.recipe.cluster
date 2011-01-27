@@ -151,9 +151,9 @@ class Service(BaseService):
     def status(self):
         pid = self.pid or "no pid"
         if self.alive():
-            print "'%s' is alive (%s)." % (self.servicename, pid)
+            print "'%s' is alive (%s)." % (self.service, pid)
         else:
-            print "'%s' is not running." % self.servicename
+            print "'%s' is not running." % self.service
 
 
 class Services(object):
