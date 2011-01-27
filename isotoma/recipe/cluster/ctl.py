@@ -222,10 +222,12 @@ def main(services_yaml, name, bindir, varrundir):
             return services.status()
     except NothingToDo, e:
         print >>sys.stderr, "Nothing To Do:", e.args[0]
+        sys.exit(0)
     except ActionFailed, e:
         print >>sys.stderr, "Action Failed:", e.args[0]
+        sys.exit(1)
 
     print >>sys.stderr, "%s (start|stop|restart|status)" % name
-    return 1
+    sys.exit(0)
 
 
