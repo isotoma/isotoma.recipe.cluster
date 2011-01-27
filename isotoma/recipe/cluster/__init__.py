@@ -32,13 +32,15 @@ class Cluster(object):
         pybin = self.buildout["buildout"]["executable"]
         bindir = self.buildout['buildout']['bin-directory']
 
-        serialized = {}
+        serialized = []
         for name in self.options["services"].split():
             part = self.buildout[name]
 
-            x = serialized[name] = {}
+            x = {}
             for key, value in part.items():
                 x[key] = value
+
+            serialized.append((name, x))
 
         ws = easy_install.working_set(
             ["isotoma.recipe.cluster"], pybin,

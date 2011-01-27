@@ -149,12 +149,10 @@ class Services(object):
 
     def __init__(self, bindir, varrundir, services):
         self.services = []
-        for service in services:
-            if isinstance(service, dict):
-                servicename, values = service.items()[0]
-                self.services.append(Service(bindir, varrundir, servicename, values or {}))
-            else:
-                self.services.append(Service(bindir, varrundir, service, {}))
+        for servicename, service in services:
+            if "name" in service:
+                servicename = service["name"]
+            self.services.append(Service(bindir, varrundir, servicename, service))
 
     def start(self):
         """ I start everything in the list of daemons """
