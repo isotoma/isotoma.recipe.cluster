@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, sys, subprocess, shlex, time
+import os, sys, subprocess, shlex, time, pwd
 
 try:
     import simplejson as json
@@ -205,9 +205,13 @@ class Services(object):
             service.status()
 
 
-def main(services_yaml, name, bindir, varrundir):
+def main(services_yaml, name, bindir, varrundir, user):
     if len(sys.argv) != 2:
         return 1
+
+    if user and user != pwd.getpwuid(os.getuid()).pw_name:
+        print >>sys.stderr, "Only '%s' is allowed to run this script" % user
+        return
 
     services = Services(bindir, varrundir, json.loads(services_yaml))
 
