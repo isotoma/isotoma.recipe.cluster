@@ -170,10 +170,15 @@ class Services(object):
     def start(self):
         """ I start everything in the list of daemons """
         for service in self.services:
-            service.start()
+            try:
+                service.start()
+            except NothingToDo:
+                print "Skipped as already running"
 
     def stop(self):
         """ I reverse the list of daemons, then stop everything """
+        errorflag = False
+
         services = self.services[:]
         services.reverse()
         for service in services:
@@ -181,7 +186,13 @@ class Services(object):
                 service.stop()
             except NothingToDo:
                 # if service is already stopped, we just carry on
-                pass
+                print "Skipped as already stopped"
+            except ActionFailed, e:
+                print e.args[0]
+                errorflag = True
+
+        if errorflag:
+            raise ActionFailed("Not all services shut down")
 
     def restart(self):
         """ I stop all of the daemons, then start them again """
