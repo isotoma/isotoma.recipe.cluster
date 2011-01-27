@@ -16,7 +16,7 @@ import logging, os, sys
 from zc.buildout import UserError, easy_install
 
 try:
-    from simplejson as json
+    import simplejson as json
 except ImportError:
     import json
 

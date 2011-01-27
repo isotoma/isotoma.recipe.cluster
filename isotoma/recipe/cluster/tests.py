@@ -16,7 +16,7 @@ from isotoma.recipe.cluster.ctl import BaseService, Service, Services, NothingTo
 def setUp(test):
     zc.buildout.testing.buildoutSetUp(test)
     zc.buildout.testing.install_develop('isotoma.recipe.cluster', test)
-    zc.buildout.testing.install('PyYAML', test)
+    zc.buildout.testing.install('simplejson', test)
     zc.buildout.testing.install('zope.testing', test)
 
 
