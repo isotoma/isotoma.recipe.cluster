@@ -12,13 +12,25 @@ Lets create a minimal `buildout.cfg` file::
   ... parts = cluster
   ... offline = true
   ...
+  ... [cluster:zeoserver]
+  ... name = zeoserver
+  ...
+  ... [cluster:zope0]
+  ... name = zope0
+  ...
+  ... [cluster:zope1]
+  ... name = zope1
+  ...
+  ... [cluster:zope2]
+  ... name = zope2
+  ...
   ... [cluster]
   ... recipe = isotoma.recipe.cluster
   ... services =
-  ...     - zeoserver
-  ...     - zope0
-  ...     - zope1
-  ...     - zope2
+  ...     cluster:zeoserver
+  ...     cluster:zope0
+  ...     cluster:zope1
+  ...     cluster:zope2
   ... ''')
 
 Now we can run buildout::
@@ -26,28 +38,4 @@ Now we can run buildout::
   >>> print system(join('bin', 'buildout')),
   Installing cluster.
   Generated script '/sample-buildout/bin/cluster'.
-
-A wrapper script should have been created::
-
-  >>> cat('bin/cluster')
-  <BLANKLINE>
-  import sys
-  sys.path[0:0] = [
-    '/sample-pyN.N.egg',
-    ]
-  <BLANKLINE>
-  services = """
-  - zeoserver
-  - zope0
-  - zope1
-  - zope2"""
-  bindir = "/sample-buildout/bin"
-  varrundir = "/sample-buildout/var/run"
-  <BLANKLINE>
-  <BLANKLINE>
-  import isotoma.recipe.cluster.ctl
-  <BLANKLINE>
-  if __name__ == '__main__':
-      isotoma.recipe.cluster.ctl.main(services, bindir, varrundir)
-
 

@@ -13,10 +13,16 @@
 # limitations under the License.
 
 import os, sys, subprocess, shlex, time
-import yaml
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 class NothingToDo(Exception):
     pass
+
 
 class ActionFailed(Exception):
     pass
@@ -181,7 +187,7 @@ def main(services_yaml, name, bindir, varrundir):
     if len(sys.argv) != 2:
         return 1
 
-    services = Services(bindir, varrundir, yaml.load(services_yaml))
+    services = Services(bindir, varrundir, json.loads(services_yaml))
 
     try:
         if sys.argv[1] == "start":

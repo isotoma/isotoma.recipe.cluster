@@ -13,8 +13,13 @@
 # limitations under the License.
 
 import logging, os, sys
-import yaml
 from zc.buildout import UserError, easy_install
+
+try:
+    from simplejson as json
+except ImportError:
+    import json
+
 
 class Cluster(object):
 
@@ -27,13 +32,16 @@ class Cluster(object):
         pybin = self.buildout["buildout"]["executable"]
         bindir = self.buildout['buildout']['bin-directory']
 
-        try:
-            config = yaml.load(self.options["services"])
-        except:
-            raise UserError("Error parsing yaml")
+        serialized = {}
+        for name in self.options["services"].split():
+            part = self.buildout[name]
+
+            x = serialized[name] = {}
+            for key, value in part.items():
+                x[key] = value
 
         ws = easy_install.working_set(
-            ["PyYAML", "isotoma.recipe.cluster"], pybin,
+            ["isotoma.recipe.cluster"], pybin,
             [self.buildout["buildout"]['develop-eggs-directory'], self.buildout['buildout']['eggs-directory']])
 
         initialization = \
@@ -43,7 +51,7 @@ class Cluster(object):
             'varrundir = "%(varrundir)s"\n'
 
         initialization = initialization % {
-            "services": self.options["services"],
+            "services": json.dumps(serialized),
             "name": self.name,
             "bindir": bindir,
             "varrundir": self.options.get("varrun-directory", os.path.join(self.buildout['buildout']['directory'],"var","run")),
@@ -54,5 +62,4 @@ class Cluster(object):
             ws, pybin, bindir, initialization=initialization, arguments='services, name, bindir, varrundir')
 
         return [os.path.join(bindir, self.name)]
-
 
