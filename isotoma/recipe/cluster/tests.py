@@ -58,7 +58,7 @@ class TestCtl(unittest.TestCase):
                 "stop-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
                 "env": {"PYTHONPATH": ":".join(sys.path)},
                 }
-            services.append({pid: service})
+            services.append([pid, service])
 
         return Services("", "", services)
 
