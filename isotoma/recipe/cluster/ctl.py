@@ -102,6 +102,17 @@ class Service(BaseService):
             return self.settings["env"]
         return None
 
+    @property
+    def user(self):
+        return self.settings.get("user", None)
+
+    def get_command(self, command, user):
+        cmd = []
+        if user:
+            cmd = ["sudo", "-u", user]
+        cmd.extend(shlex.split(command))
+        return cmd
+
     def start(self):
         """ I attempt to to start a service """
 
@@ -111,7 +122,7 @@ class Service(BaseService):
             raise NothingToDo("Service already running")
             return 1
 
-        p = subprocess.Popen(shlex.split(self.start_command), env=self.env)
+        p = subprocess.Popen(self.get_command(self.start_command, self.user), env=self.env)
         p.wait()
 
         if p.returncode != 0:
@@ -134,7 +145,7 @@ class Service(BaseService):
         if not self.alive():
             raise NothingToDo("Service is already stopped")
 
-        p = subprocess.Popen(shlex.split(self.stop_command), env=self.env)
+        p = subprocess.Popen(self.get_command(self.stop_command, self.user), env=self.env)
         p.wait()
 
         if p.returncode != 0:
