@@ -110,7 +110,7 @@ class Service(BaseService):
         cmd = []
         if user:
             cmd = ["sudo", "-u", user]
-        cmd.extend(shlex.split(command))
+        cmd.extend(shlex.split(command.encode("UTF-8")))
         return cmd
 
     def start(self):
