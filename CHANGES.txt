@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.0.3 (unreleased)
+0.0.3 (2011-08-23)
 ------------------
 
 - Fix shlex split aginst unicode strings
