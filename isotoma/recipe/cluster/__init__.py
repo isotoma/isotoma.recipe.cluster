@@ -50,20 +50,22 @@ class Cluster(object):
             'services = """%(services)s"""\n' + \
             'name = "%(name)s"\n' + \
             'bindir = "%(bindir)s"\n' + \
-            'varrundir = "%(varrundir)s"\n' \
-            'forceuser = "%(user)s"\n' \
+            'varrundir = "%(varrundir)s"\n' + \
+            'forceuser = "%(user)s"\n' + \
+            'owner = "%(owner)s"\n'
 
         initialization = initialization % {
             "services": json.dumps(serialized),
             "name": self.name,
             "bindir": bindir,
             "varrundir": self.options.get("varrun-directory", os.path.join(self.buildout['buildout']['directory'],"var","run")),
-            "user": self.options.get("force-user", ""),
+            "user": self.options.get("force-user", "root"),
+            "owner": self.options.get("owner", "root"),
             }
 
         scripts = easy_install.scripts(
             [(self.name, "isotoma.recipe.cluster.ctl", "main")],
-            ws, pybin, bindir, initialization=initialization, arguments='services, name, bindir, varrundir, forceuser')
+            ws, pybin, bindir, initialization=initialization, arguments='services, name, bindir, varrundir, forceuser, owner')
 
         return [os.path.join(bindir, self.name)]
 

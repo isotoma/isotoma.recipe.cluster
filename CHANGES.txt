@@ -4,7 +4,7 @@ Changelog
 0.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Create the varrun directory if it doesnt exist
 
 
 0.0.3 (2011-08-23)

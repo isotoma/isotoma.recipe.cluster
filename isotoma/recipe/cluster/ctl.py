@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, sys, subprocess, shlex, time, pwd
+import os, sys, subprocess, shlex, time, pwd, grp
 
 try:
     import simplejson as json
@@ -216,13 +216,18 @@ class Services(object):
             service.status()
 
 
-def main(services_yaml, name, bindir, varrundir, user):
+def main(services_yaml, name, bindir, varrundir, user, owner):
     if len(sys.argv) != 2:
         return 1
 
     if user and user != pwd.getpwuid(os.getuid()).pw_name:
         print >>sys.stderr, "Only '%s' is allowed to run this script" % user
         return
+
+    if not os.path.exists(varrundir):
+        os.makedirs(varrundir)
+        os.chown(varrundir, pwg.getpwnam(owner).pw_uid, grp.getgrnam(owner).gr_gid)
+        ow.chmod(varrundir, 0755)
 
     services = Services(bindir, varrundir, json.loads(services_yaml))
 
