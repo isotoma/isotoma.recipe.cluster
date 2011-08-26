@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.0.4 (unreleased)
+0.0.4 (2011-08-26)
 ------------------
 
 - Create the varrun directory if it doesnt exist
