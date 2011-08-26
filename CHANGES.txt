@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 - Create the varrun directory if it doesnt exist
+- Pick up ${buildout:run-directory} if its set
 
 
 0.0.3 (2011-08-23)

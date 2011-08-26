@@ -28,6 +28,11 @@ class Cluster(object):
         self.name = name
         self.options = options
 
+        if 'run-directory' in buildout:
+            options.setdefault("varrun-directory", buildout['run-directory'])
+        else:
+            options.setdefault("varrun-directory", os.path.join(self.buildout['buildout']['directory'], "var", "run"))
+
     def install(self):
         pybin = self.buildout["buildout"]["executable"]
         bindir = self.buildout['buildout']['bin-directory']
@@ -58,7 +63,7 @@ class Cluster(object):
             "services": json.dumps(serialized),
             "name": self.name,
             "bindir": bindir,
-            "varrundir": self.options.get("varrun-directory", os.path.join(self.buildout['buildout']['directory'],"var","run")),
+            "varrundir": self.options["varrun-directory"],
             "user": self.options.get("force-user", "root"),
             "owner": self.options.get("owner", "root"),
             }
