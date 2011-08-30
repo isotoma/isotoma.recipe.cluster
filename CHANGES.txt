@@ -1,10 +1,10 @@
 Changelog
 =========
 
-0.0.5 (unreleased)
+0.0.5 (2011-08-31)
 ------------------
 
-- Nothing changed yet.
+- Fix typos
 
 
 0.0.4 (2011-08-26)
