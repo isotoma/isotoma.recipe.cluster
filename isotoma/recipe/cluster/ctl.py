@@ -227,7 +227,7 @@ def main(services_yaml, name, bindir, varrundir, user, owner):
     if not os.path.exists(varrundir):
         os.makedirs(varrundir)
         os.chown(varrundir, pwd.getpwnam(owner).pw_uid, grp.getgrnam(owner).gr_gid)
-        ow.chmod(varrundir, 0755)
+        os.chmod(varrundir, 0755)
 
     services = Services(bindir, varrundir, json.loads(services_yaml))
 
