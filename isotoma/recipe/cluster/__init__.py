@@ -15,12 +15,6 @@
 import logging, os, sys
 from zc.buildout import UserError, easy_install
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
-
 class Cluster(object):
 
     def __init__(self, buildout, name, options):
@@ -36,41 +30,44 @@ class Cluster(object):
     def install(self):
         pybin = self.buildout["buildout"]["executable"]
         bindir = self.buildout['buildout']['bin-directory']
+        partsdir = os.path.join(self.buildout['buildout']['parts-directory'], self.name)
+        cfg = os.path.join(partsdir, "cluster.cfg")
 
-        serialized = []
-        for name in self.options["services"].split():
+        if not os.path.exists(partsdir):
+            os.makedirs(partsdir)
+
+        services = []
+        for s in self.options["services"].strip().split():
+            s = s.strip()
+            if s:
+                services.append(s)
+
+        config = ConfigParser.RawConfigParser()
+
+        config.add_section('cluster')
+        config.set('cluster', 'services', ' '.join(services))
+        config.set('cluster', 'name', self.name)
+        config.set('cluster', 'bindir', bindir)
+        config.set('cluster', 'varrundir', self.options["varrun-directory"])
+        config.set('cluster', 'user', self.options.get("force-user", "root")
+        config.set('cluster', 'owner', self.options.get("owner", "root"))
+
+        for s in services:
+            config.add_section(s)
+
             part = self.buildout[name]
-
-            x = {}
             for key, value in part.items():
-                x[key] = value
+                config.set(s, key, value)
 
-            serialized.append((name, x))
+        config.write(open(cfg, 'wb'))
 
         ws = easy_install.working_set(
             ["isotoma.recipe.cluster"], pybin,
             [self.buildout["buildout"]['develop-eggs-directory'], self.buildout['buildout']['eggs-directory']])
 
-        initialization = \
-            'services = """%(services)s"""\n' + \
-            'name = "%(name)s"\n' + \
-            'bindir = "%(bindir)s"\n' + \
-            'varrundir = "%(varrundir)s"\n' + \
-            'forceuser = "%(user)s"\n' + \
-            'owner = "%(owner)s"\n'
-
-        initialization = initialization % {
-            "services": json.dumps(serialized),
-            "name": self.name,
-            "bindir": bindir,
-            "varrundir": self.options["varrun-directory"],
-            "user": self.options.get("force-user", "root"),
-            "owner": self.options.get("owner", "root"),
-            }
-
         scripts = easy_install.scripts(
             [(self.name, "isotoma.recipe.cluster.ctl", "main")],
-            ws, pybin, bindir, initialization=initialization, arguments='services, name, bindir, varrundir, forceuser, owner')
+            ws, pybin, bindir, arguments='"%s"' % cfg)
 
-        return [os.path.join(bindir, self.name)]
+        return [os.path.join(bindir, self.name), cfg]
 
