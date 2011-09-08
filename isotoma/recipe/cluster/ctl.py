@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, sys, subprocess, shlex, time, pwd, grp
+import os, sys, subprocess, shlex, time, pwd, grp, ConfigParser
 
 try:
     import simplejson as json
@@ -173,10 +173,8 @@ class Services(object):
 
     def __init__(self, bindir, varrundir, services):
         self.services = []
-        for servicename, service in services:
-            if "name" in service:
-                servicename = service["name"]
-            self.services.append(Service(bindir, varrundir, servicename, service))
+        for service in services:
+            self.services.append(Service(bindir, varrundir, service["name"], service))
 
     def start(self):
         """ I start everything in the list of daemons """
@@ -216,11 +214,21 @@ class Services(object):
             service.status()
 
 
-def main(services_yaml, name, bindir, varrundir, user, owner):
+def main(path):
     if len(sys.argv) != 2:
         return 1
 
-    if user and user != pwd.getpwuid(os.getuid()).pw_name:
+    config = ConfigParser.RawConfigParser()
+    config.read(path)
+
+    user = config.get('cluster', 'user')
+    owner = config.get('cluster', 'owner')
+    bindir = config.get('cluster', 'bindir')
+    varrundir = config.get('cluster', 'varrundir')
+
+    svcinf = [dict(config.items(s)) for s in config.get('cluster', 'services').strip().split(" ")]
+
+    if user != pwd.getpwuid(os.getuid()).pw_name:
         print >>sys.stderr, "Only '%s' is allowed to run this script" % user
         return
 
@@ -229,7 +237,7 @@ def main(services_yaml, name, bindir, varrundir, user, owner):
         os.chown(varrundir, pwd.getpwnam(owner).pw_uid, grp.getgrnam(owner).gr_gid)
         os.chmod(varrundir, 0755)
 
-    services = Services(bindir, varrundir, json.loads(services_yaml))
+    services = Services(bindir, varrundir, svcinf)
 
     try:
         if sys.argv[1] == "start":
