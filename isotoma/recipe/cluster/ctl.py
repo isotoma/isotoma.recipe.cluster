@@ -173,10 +173,8 @@ class Services(object):
 
     def __init__(self, bindir, varrundir, services):
         self.services = []
-        for servicename, service in services:
-            if "name" in service:
-                servicename = service["name"]
-            self.services.append(Service(bindir, varrundir, servicename, service))
+        for service in services:
+            self.services.append(Service(bindir, varrundir, service["name"], service))
 
     def start(self):
         """ I start everything in the list of daemons """
@@ -228,7 +226,7 @@ def main(path):
     bindir = config.get('cluster', 'bindir')
     varrundir = config.get('cluster', 'varrundir')
 
-    svcinf = [dict(config.items(s)) for s in config.get('cluster', 'services')]
+    svcinf = [dict(config.items(s)) for s in config.get('cluster', 'services').strip().split(" ")]
 
     if user != pwd.getpwuid(os.getuid()).pw_name:
         print >>sys.stderr, "Only '%s' is allowed to run this script" % user

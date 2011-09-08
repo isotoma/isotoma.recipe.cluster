@@ -49,13 +49,14 @@ class Cluster(object):
         config.set('cluster', 'name', self.name)
         config.set('cluster', 'bindir', bindir)
         config.set('cluster', 'varrundir', self.options["varrun-directory"])
-        config.set('cluster', 'user', self.options.get("force-user", "root")
+        config.set('cluster', 'user', self.options.get("force-user", "root"))
         config.set('cluster', 'owner', self.options.get("owner", "root"))
 
         for s in services:
             config.add_section(s)
+            config.set(s, "name", s)
 
-            part = self.buildout[name]
+            part = self.buildout[s]
             for key, value in part.items():
                 config.set(s, key, value)
 
