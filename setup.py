@@ -31,7 +31,6 @@ setup(
     install_requires = [
         'setuptools',
         'zc.buildout',
-        'simplejson',
     ],
     extras_require=dict(
         test = ['zope.testing',],
