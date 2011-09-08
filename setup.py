@@ -37,7 +37,7 @@ setup(
     ),
     entry_points = {
         "zc.buildout": [
-            "default = isotoma.recipe.cluster:Cluster",
+            "default = isotoma.recipe.cluster.recipe:Cluster",
         ],
     }
 )
