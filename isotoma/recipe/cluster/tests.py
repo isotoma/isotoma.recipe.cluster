@@ -42,6 +42,7 @@ class TestCtl(unittest.TestCase):
 
     def service(self, pid):
         s = Service("", "", "cluster", {
+            "name": pid,
             "pidfile": os.path.realpath(pid),
             "start-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "start")),
             "stop-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
@@ -53,12 +54,13 @@ class TestCtl(unittest.TestCase):
         services = []
         for pid in pids:
             service = {
+                "name": pid,
                 "pidfile": os.path.realpath(pid),
                 "start-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "start")),
                 "stop-command": " ".join((sys.executable, sibpath("testservice.py"), os.path.realpath(pid), "stop")),
                 "env": {"PYTHONPATH": ":".join(sys.path)},
                 }
-            services.append([pid, service])
+            services.append(service)
 
         return Services("", "", services)
 
