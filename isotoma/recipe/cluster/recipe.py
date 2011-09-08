@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging, os, sys
+import logging, os, sys, ConfigParser
 from zc.buildout import UserError, easy_install
 
 class Cluster(object):
