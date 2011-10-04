@@ -4,7 +4,7 @@ Changelog
 0.0.8 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Don't sudo if it can be helped
 
 
 0.0.7 (2011-09-08)

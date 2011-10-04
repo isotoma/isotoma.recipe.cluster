@@ -108,8 +108,10 @@ class Service(BaseService):
 
     def get_command(self, command, user):
         cmd = []
-        if user:
+
+        if user and pwd.getpwnam(user).pw_uid != os.getuid():
             cmd = ["sudo", "-u", user]
+
         cmd.extend(shlex.split(command.encode("UTF-8")))
         return cmd
 
