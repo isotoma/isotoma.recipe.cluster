@@ -230,7 +230,7 @@ def main(path):
 
     svcinf = [dict(config.items(s)) for s in config.get('cluster', 'services').strip().split(" ")]
 
-    if user != pwd.getpwuid(os.getuid()).pw_name:
+    if len(user.strip()) > 0 and user != pwd.getpwuid(os.getuid()).pw_name:
         print >>sys.stderr, "Only '%s' is allowed to run this script" % user
         return
 
