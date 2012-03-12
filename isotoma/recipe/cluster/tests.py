@@ -130,6 +130,14 @@ class TestCtl(unittest.TestCase):
         s.stop()
         self.failUnless(not self.status_service("a.pid") and not self.status_service("b.pid"))
 
+    def test_services_status(self):
+        s = self.services("a.pid", "b.pid")
+        self.assertEqual(s.status(), 2)
+        s.start()
+        self.assertEqual(s.status(), 0)
+        s.stop()
+        self.assertEqual(s.status(), 2)
+
 
 def test_suite():
     tests = [

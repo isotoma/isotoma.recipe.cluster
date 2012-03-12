@@ -4,7 +4,8 @@ Changelog
 0.0.10 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Add a 'running' subcommand. Exit code 0 means all the services are running.
+  Exit code 1 means 1 server is missing, 2 means 2 are missing and so on.
 
 
 0.0.9 (2012-02-02)

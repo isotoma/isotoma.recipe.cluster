@@ -165,8 +165,10 @@ class Service(BaseService):
         pid = self.pid or "no pid"
         if self.alive():
             print "'%s' is alive (%s)." % (self.service, pid)
+            return True
         else:
             print "'%s' is not running." % self.service
+            return False
 
 
 class Services(object):
@@ -212,8 +214,11 @@ class Services(object):
 
     def status(self):
         """ I iterate a dictionary of daemon information and get status info """
+        not_running = 0
         for service in self.services:
-            service.status()
+            if not service.status():
+                not_running += 1
+        return not_running
 
 
 def main(path):
@@ -250,6 +255,8 @@ def main(path):
             return services.restart()
         elif sys.argv[1] == "status":
             return services.status()
+        elif sys.argv[1] == "running":
+            sys.exit(services.status())
     except NothingToDo, e:
         print >>sys.stderr, "Nothing To Do:", e.args[0]
         sys.exit(0)
@@ -257,7 +264,7 @@ def main(path):
         print >>sys.stderr, "Action Failed:", e.args[0]
         sys.exit(1)
 
-    print >>sys.stderr, "%s (start|stop|restart|status)" % name
+    print >>sys.stderr, "%s (start|stop|restart|status|running)" % name
     sys.exit(0)
 
 
