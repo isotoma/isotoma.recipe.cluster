@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.0.10 (unreleased)
+0.0.10 (2012-03-12)
 -------------------
 
 - Add a 'running' subcommand. Exit code 0 means all the services are running.
