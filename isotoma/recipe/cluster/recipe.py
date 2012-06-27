@@ -68,7 +68,8 @@ class Cluster(object):
 
         scripts = easy_install.scripts(
             [(self.name, "isotoma.recipe.cluster.ctl", "main")],
-            ws, pybin, bindir, arguments='"%s"' % cfg)
+            ws, pybin, bindir, arguments='"%s"' % cfg,
+            initialization=self.options.get("preamble", ""))
 
         return [os.path.join(bindir, self.name), cfg]
 

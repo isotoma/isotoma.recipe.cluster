@@ -4,7 +4,8 @@ Changelog
 0.0.11 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Allow arbritary text to be inserted into a cluster script (the intention is
+  to be able to inject comments for init systems to scan.
 
 
 0.0.10 (2012-03-12)
