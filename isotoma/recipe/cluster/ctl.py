@@ -130,7 +130,7 @@ class Service(BaseService):
         if p.returncode != 0:
             raise ActionFailed("Start script reported error")
 
-        for i in range(100):
+        for i in range(600):
             time.sleep(0.1)
             if self.alive():
                 return
@@ -153,7 +153,7 @@ class Service(BaseService):
         if p.returncode != 0:
             raise ActionFailed("Stop script reported error")
 
-        for i in range(100):
+        for i in range(600):
             time.sleep(0.1)
             if not self.alive():
                 return
